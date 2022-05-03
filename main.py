@@ -38,7 +38,7 @@ model = SwinTransformerV2(
         relative_coords_table_type='norm8_log_192to224',
         checkpoint_blocks=[255,0,255,0] # 255: Apply checkpoint for all blocks of the stage; 0: Do not apply checkpoint for the stage.
 )
-model.init_weights(pretrain_model)
+model.init_weights(pretrain_model) # load pre-train model
 model.cuda()
 
 
