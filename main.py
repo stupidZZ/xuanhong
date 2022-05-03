@@ -34,9 +34,9 @@ model = SwinTransformerV2(
         drop_path_rate=0.2,
         ape=False,
         patch_norm=True,
-        use_checkpoint=False,
+        use_checkpoint=True,
         relative_coords_table_type='norm8_log_192to224',
-        checkpoint_blocks=[255,255,255,255]
+        checkpoint_blocks=[255,0,255,0] # 255: Apply checkpoint for all blocks of the stage; 0: Do not apply checkpoint for the stage.
 )
 model.init_weights(pretrain_model)
 model.cuda()
@@ -59,7 +59,7 @@ model_seq = SwinTransformerV2SeqAtten(
         use_checkpoint=True,
         relative_coords_table_type='norm8_log_192to224',
         checkpoint_blocks=[255,255,255,255],
-        head_chunk_size=[4, 8, 16, 32],
+        head_chunk_size=[4, 8, 16, 32], 
 )
 model_seq.init_weights(pretrain_model)
 model_seq.cuda()
