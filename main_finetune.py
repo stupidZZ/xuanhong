@@ -70,20 +70,20 @@ model_seq.cuda()
 model_opt = build_finetune_optimizer(model, 
                                      depths=[2, 2, 18, 2],
                                      opt_params={'opt_type': 'adamw',
-                                                    'base_lr': 1e-1,
-                                                    'layer_decay': 0.8,
-                                                    'weight_decay': 0.4,
-                                                    'eps': 1e-5,
+                                                    'base_lr': 5e-3,
+                                                    'layer_decay': 0.75,
+                                                    'weight_decay': 0.05,
+                                                    'eps': 1e-8,
                                                     'betas': [0.9, 0.999]}
                                     )
 
 model_seq_opt = build_finetune_optimizer(model_seq, 
                                         depths=[2, 2, 18, 2],
-                                        opt_params={'opt_type': 'adamw',
-                                                    'base_lr': 1e-1,
-                                                    'layer_decay': 0.8, 
-                                                    'weight_decay': 0.4,
-                                                    'eps': 1e-5,
+                                         opt_params={'opt_type': 'adamw',
+                                                    'base_lr': 5e-3,
+                                                    'layer_decay': 0.75,
+                                                    'weight_decay': 0.05,
+                                                    'eps': 1e-8,
                                                     'betas': [0.9, 0.999]}
                                         )
 
