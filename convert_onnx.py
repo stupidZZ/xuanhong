@@ -41,21 +41,21 @@ model.init_weights(pretrain_model) # load pre-train model
 model.eval()
 
 # Input to the model
-mock_data = torch.rand((16, 3, 224, 224))
-torch_out = model(mock_data)
+mock_data = torch.rand((1, 3, 224, 224))
 
 # Export the model
 torch.onnx.export(model,               # model being run
                   mock_data,                         # model input (or a tuple for multiple inputs)
                   "swinv2.onnx",   # where to save the model (can be a file or file-like object)
                   export_params=True,        # store the trained parameter weights inside the model file
-                  opset_version=10,          # the ONNX version to export the model to
+                  opset_version=14,          # the ONNX version to export the model to
                   do_constant_folding=True,  # whether to execute constant folding for optimization
                   input_names = ['input'],   # the model's input names
                   output_names = ['output'], # the model's output names
                   dynamic_axes={'input' : {0 : 'batch_size'},    # variable length axes
                                 'output' : {0 : 'batch_size'}})
-
+model.cuda()
+torch_out = model(mock_data.cuda())
 import onnx
 
 onnx_model = onnx.load("swinv2.onnx")
@@ -71,6 +71,8 @@ def to_numpy(tensor):
 
 # compute ONNX Runtime output prediction
 ort_inputs = {ort_session.get_inputs()[0].name: to_numpy(mock_data)}
+# ort_inputs = {ort_session.get_inputs()[0].name: mock_data}
+
 ort_outs = ort_session.run(None, ort_inputs)
 
 # compare ONNX Runtime and PyTorch results

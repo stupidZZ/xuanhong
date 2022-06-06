@@ -81,7 +81,7 @@ model_seq_opt = build_finetune_optimizer(model_seq,
                                         depths=[2, 2, 18, 2],
                                         opt_params={'opt_type': 'adamw',
                                                     'base_lr': 1e-1,
-                                                    'layer_decay': 0.8,
+                                                    'layer_decay': 0.8, 
                                                     'weight_decay': 0.4,
                                                     'eps': 1e-5,
                                                     'betas': [0.9, 0.999]}
