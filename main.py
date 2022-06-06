@@ -9,6 +9,8 @@ import torch.optim as optim
 
 from swin_v2 import SwinTransformerV2
 from swin_v2_seq_atten import SwinTransformerV2SeqAtten
+from optimizer_helper import build_finetune_optimizer
+
 pretrain_model = "/data/home/zhez/models/swin_v2.pth"
 
 def train_one_step(model, opt, data):
@@ -65,8 +67,29 @@ model_seq.init_weights(pretrain_model)
 model_seq.cuda()
 
 
-model_opt = optim.SGD(model.parameters(), lr=1e-5, momentum=0.9)
-model_seq_opt = optim.SGD(model_seq.parameters(), lr=1e-5, momentum=0.9)
+model_opt = build_finetune_optimizer(model, 
+                                     depths=[2, 2, 18, 2],
+                                     opt_params={'opt_type': 'adamw',
+                                                    'base_lr': 1e-1,
+                                                    'layer_decay': 0.8,
+                                                    'weight_decay': 0.4,
+                                                    'eps': 1e-5,
+                                                    'betas': [0.9, 0.999]}
+                                    )
+
+model_seq_opt = build_finetune_optimizer(model_seq, 
+                                        depths=[2, 2, 18, 2],
+                                        opt_params={'opt_type': 'adamw',
+                                                    'base_lr': 1e-1,
+                                                    'layer_decay': 0.8,
+                                                    'weight_decay': 0.4,
+                                                    'eps': 1e-5,
+                                                    'betas': [0.9, 0.999]}
+                                        )
+
+
+# model_opt = optim.SGD(model.parameters(), lr=1e-5, momentum=0.9)
+# model_seq_opt = optim.SGD(model_seq.parameters(), lr=1e-5, momentum=0.9)
 
 mock_data = torch.rand((16, 3, 224, 224)).cuda()
 out = train_one_step(model, model_opt, mock_data)
