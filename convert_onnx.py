@@ -23,6 +23,8 @@ model = SwinTransformerV2(
         embed_dim=128,
         depths=[2, 2, 18, 2],
         num_heads=[4, 8, 16, 32],
+        # depths=[1,1,1,1],
+        # num_heads=[1, 8, 16, 32],
         window_size=14,
         mlp_ratio=4,
         qkv_bias=True,
@@ -33,7 +35,7 @@ model = SwinTransformerV2(
         patch_norm=True,
         relative_coords_table_type='norm8_log_192to224',
 )
-model.init_weights(pretrain_model) # load pre-train model
+# model.init_weights(pretrain_model) # load pre-train model
 # model.cuda()
 
 
@@ -41,7 +43,7 @@ model.init_weights(pretrain_model) # load pre-train model
 model.eval()
 
 # Input to the model
-mock_data = torch.rand((1, 3, 224, 224))
+mock_data = torch.rand((16, 3, 224, 224))
 
 # Export the model
 torch.onnx.export(model,               # model being run
@@ -55,7 +57,9 @@ torch.onnx.export(model,               # model being run
                   dynamic_axes={'input' : {0 : 'batch_size'},    # variable length axes
                                 'output' : {0 : 'batch_size'}})
 model.cuda()
-torch_out = model(mock_data.cuda())
+
+mock_data_2 = torch.rand((1, 3, 224, 224))
+torch_out = model(mock_data_2.cuda())
 import onnx
 
 onnx_model = onnx.load("swinv2.onnx")
@@ -70,7 +74,7 @@ def to_numpy(tensor):
     return tensor.detach().cpu().numpy() if tensor.requires_grad else tensor.cpu().numpy()
 
 # compute ONNX Runtime output prediction
-ort_inputs = {ort_session.get_inputs()[0].name: to_numpy(mock_data)}
+ort_inputs = {ort_session.get_inputs()[0].name: to_numpy(mock_data_2)}
 # ort_inputs = {ort_session.get_inputs()[0].name: mock_data}
 
 ort_outs = ort_session.run(None, ort_inputs)
